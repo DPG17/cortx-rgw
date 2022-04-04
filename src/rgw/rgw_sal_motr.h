@@ -742,6 +742,8 @@ protected:
   const std::string part_num_str;
   std::unique_ptr<MotrObject> part_obj;
   uint64_t actual_part_size = 0;
+  // Part object size available from Content-Length header
+  uint64_t expected_part_size = 0;
 
 public:
   MotrMultipartWriter(const DoutPrefixProvider *dpp,
@@ -754,6 +756,11 @@ public:
 				  Writer(dpp, y), store(_store), head_obj(std::move(_head_obj)),
 				  part_num(_part_num), part_num_str(part_num_str)
   {
+    struct req_state *s = static_cast<struct req_state *>(obj_ctx.get_private());
+    if (s) {
+      // Save the part's size available from Content-Length header
+      expected_part_size = s->content_length;
+    }
   }
   ~MotrMultipartWriter() = default;
 

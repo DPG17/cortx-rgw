@@ -3053,7 +3053,8 @@ int MotrMultipartWriter::prepare(optional_yield y)
 
   // s3 client may retry uploading part, so the part may have already
   // been created.
-  int rc = part_obj->create_mobj(dpp, store->cctx->_conf->rgw_max_chunk_size);
+  ldpp_dout(dpp, 20) << "Creating object for size =" << expected_part_size << dendl;
+  int rc = part_obj->create_mobj(dpp, expected_part_size);
   if (rc == -EEXIST) {
     rc = part_obj->open_mobj(dpp);
     if (rc < 0)
